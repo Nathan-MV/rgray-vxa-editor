@@ -5,8 +5,8 @@ module Settings
     title: 'VXA Editor',
     icon: 'icon.png',
     fullscreen: false,
-    width: 320 * 4, # Default width of the game window in pixels.
-    height: 180 * 4, # Default height of the game window in pixels.
+    width: 1280, # Default width of the game window in pixels.
+    height: 720, # Default height of the game window in pixels.
     integer_scale: 1, # Default scale of the resolution: 1: (320x180), 2: (640x360), 4: (1280x720) (HD), 6: (1920x1080) (UHD), 8: (3840x2160) (4K).
     vsync: true, # Enable or disable vertical synchronization.
     resizable: false, # Can the game window be resized by the user?

@@ -72,6 +72,10 @@ module Graphics
     end
     alias snap snap_to_bitmap
 
+    def resized?
+      @width != @default_width || @height != @default_height
+    end
+
     private
 
     def config_flags

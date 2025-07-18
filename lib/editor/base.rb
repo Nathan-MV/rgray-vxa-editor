@@ -15,37 +15,36 @@ module Editor
       dropdown_box: { width: 0.1, height: 0.03 },
       combo_box: { width: 0.1, height: 0.03 },
       button: { width: 0.08, height: 0.03 },
-      list_view: { width: 0.080, height: 0.1 }
+      list_view: { width: 0.08, height: 0.1 }
     }
 
     def initialize(*args)
       Gui.enable_tooltip
-      @last_screen_width = Graphics.screen_width
-      @last_screen_height = Graphics.screen_height
     end
 
     def update(dt)
-      update_properties_on_resize if window_resized?
+      update_properties_on_resize if Graphics.resized?
       %i[TEXTBOX VALUEBOX DROPDOWNBOX LISTVIEW].each do |control|
         Gui.set_style(Gui.const_get(control), Gui::TEXT_ALIGNMENT, Gui::TEXT_ALIGN_LEFT)
       end
     end
 
     def draw
+      # intended for subclasses to implement
     end
 
     private
 
     def initialize_properties(controls)
       @controls = controls
-      @controls.each { |control_type, elements| setup_element_properties(control_type, elements) }
+      controls.each { |type, elements| setup_element_properties(type, elements) }
     end
 
     def setup_element_properties(control_type, elements)
       elements.each_value do |properties|
-        properties[:scroll_index] = 0
-        properties[:value_index] = 0
-        properties[:recursive] = true
+        properties[:scroll_index] ||= 0
+        properties[:value_index] ||= 0
+        properties[:recursive] = true unless properties.key?(:recursive)
         set_control_dimensions(control_type, properties)
       end
     end
@@ -60,14 +59,10 @@ module Editor
       )
     end
 
-    def window_resized?
-      resized = Graphics.screen_width != @last_screen_width || Graphics.screen_height != @last_screen_height
-      @last_screen_width, @last_screen_height = Graphics.screen_width, Graphics.screen_height if resized
-      resized
-    end
-
     def update_properties_on_resize
-      @controls.each { |control_type, elements| elements.each_value { |properties| set_control_dimensions(control_type, properties) } }
+      @controls.each do |control_type, elements|
+        elements.each_value { |properties| set_control_dimensions(control_type, properties) }
+      end
     end
 
     def draw_control(control_type, key, accessor: nil, special_value: nil, items: nil, sort: nil, index: nil)
@@ -112,16 +107,6 @@ module Editor
       results.empty? ? nil : results
     end
 
-    # def update_selected_item
-    #   if @item_index < 0
-    #     @item_index = @items.size - 1
-    #   elsif @item_index >= @items.size
-    #     @item_index = 0
-    #   end
-    #   @item_scroll_index = @item_index.clamp(0, @items.size - 20)
-    #   @item = @items[@item_index]
-    # end
-
     def draw_gui_control(control_type, key, properties, special_value)
       Gui.tooltip = properties[:tooltip] || '' if properties[:tooltip]
       case control_type
@@ -140,25 +125,19 @@ module Editor
     end
 
     def draw_label_for_gui_controls(control_type, properties)
-      if properties[:label_beside]
-        Gui.label(properties[:label] || '', Rect.new(properties[:rect].x - 35, properties[:rect].y, 80, properties[:rect].height)) unless [:group_box, :button].include?(control_type) || control_type == :list_view && properties[:label].empty?
-      else
-        Gui.label(properties[:label] || '', Rect.new(properties[:rect].x - 65, properties[:rect].y, 80, properties[:rect].height)) unless [:group_box, :button].include?(control_type) || control_type == :list_view && properties[:label].empty?
-      end
+      return if [:group_box, :button].include?(control_type) || (control_type == :list_view && properties[:label].to_s.empty?)
+
+      label_x = properties[:label_beside] ? properties[:rect].x - 35 : properties[:rect].x - 65
+      Gui.label(properties[:label] || '', Rect.new(label_x, properties[:rect].y, 80, properties[:rect].height))
     end
 
     def get_accessor(data, key, special_value = nil, items = nil, sort = nil, index = nil)
       accessor = format_klass_accessors(key)
       value = data.send(accessor[:method])
-      target = index ? value[index] : value
-      target = value[accessor[:index]] if accessor[:index]
-      #target = value[index, 1] if index && value.is_a?(Table)
+      target = index ? value[index] : (accessor[:index] ? value[accessor[:index]] : value)
 
-      # Translate value using sort and items
       if items && sort
-        sort.each_with_index do |sort_item, idx|
-          return items.compact[idx].id if sort_item.id == target
-        end
+        sort.each_with_index { |sort_item, idx| return items.compact[idx].id if sort_item.id == target }
       end
 
       if accessor[:sub_method]
@@ -174,15 +153,9 @@ module Editor
       accessor = format_klass_accessors(key)
       value = data.send(accessor[:method])
       target = index ? value[index] : value
-      #target = value[index, 1] if index && value.is_a?(Table)
 
-      # Handle items and sort for setting the correct value
       if items && sort
-        sort.each_with_index do |sort_item, idx|
-          next unless sort_item.id == target
-
-          target = items.compact[idx].id
-        end
+        sort.each_with_index { |sort_item, idx| target = items.compact[idx].id if sort_item.id == target }
       end
 
       if accessor[:sub_method]
@@ -190,24 +163,19 @@ module Editor
       elsif accessor[:index] && value.is_a?(Table)
         value[accessor[:index], 1] = new_value
       else
-        index ? target = new_value : data.send("#{accessor[:method]}=", new_value)
+        index ? (target[index] = new_value) : data.send("#{accessor[:method]}=", new_value)
       end
     end
 
     def format_klass_accessors(key)
       key_str = key.to_s
-      if key_str.start_with?('damage_')
-        { method: 'damage', sub_method: key_str.split('damage_')[1] }
-      elsif key_str.start_with?('effects_')
-        { method: 'effects', sub_method: key_str.split('effects_')[1] }
-      elsif key_str.start_with?('features_')
-        { method: 'features', sub_method: key_str.split('features_')[1] }
-      elsif key_str.start_with?('learnings_')
-        { method: 'learnings', sub_method: key_str.split('learnings_')[1] }
-      elsif key_str.start_with?('params_')
-        { method: 'params', sub_method: nil, index: key_str.split('params_')[1].to_i }
-      elsif key_str.start_with?('equips_')
-        { method: 'equips', sub_method: nil }
+      case key_str
+      when /\Adamage_(.+)/ then { method: 'damage', sub_method: $1 }
+      when /\Aeffects_(.+)/ then { method: 'effects', sub_method: $1 }
+      when /\Afeatures_(.+)/ then { method: 'features', sub_method: $1 }
+      when /\Alearnings_(.+)/ then { method: 'learnings', sub_method: $1 }
+      when /\Aparams_(.+)/ then { method: 'params', sub_method: nil, index: $1.to_i }
+      when /\Aequips_(.+)/ then { method: 'equips', sub_method: nil }
       else
         { method: key_str, sub_method: nil }
       end
