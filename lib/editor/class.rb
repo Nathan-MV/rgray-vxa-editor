@@ -46,7 +46,8 @@ module Editor
       %i[name].each { |key| draw_control(:text_box, key, accessor: @item) }
       draw_control(:list_view, :learnings, special_value: skills_from_learnings)
       if @item.learnings.any?
-        draw_control(:list_view, :learnings_skill_id, accessor: @item, special_value: ['None'] + $data_skills.compact.map(&:name), index: learnings_list_index)
+        draw_control(:list_view, :learnings_skill_id, accessor: @item,
+                                                      special_value: ['None'] + $data_skills.compact.map(&:name), index: learnings_list_index)
         draw_control(:value_box, :learnings_level, accessor: @item, index: learnings_list_index)
       end
       if draw_control(:button, :learnings_new)
@@ -80,7 +81,7 @@ module Editor
     end
 
     def action_learning_new
-      #save_item_state(@undo_stack)
+      # save_item_state(@undo_stack)
       new_learning = RPG::Class::Learning.new
       @item.learnings << new_learning
       action_learning_sort
@@ -89,7 +90,7 @@ module Editor
     end
 
     def action_learning_delete
-      #save_item_state(@undo_stack)
+      # save_item_state(@undo_stack)
       @item.learnings.delete_at(learnings_list_index)
       CLASS_CONTROLS[:list_view][:learnings][:value_index] = [learnings_list_index - 1, 0].max
       puts "INFO: Effect has been deleted. Click 'Save' to persist changes."

@@ -50,14 +50,20 @@ module Editor
       @features.draw
       %i[actors general graphic starting_equipment].each { |key| draw_control(:group_box, key) }
       %i[description name nickname].each { |key| draw_control(:text_box, key, accessor: @item) }
-      draw_control(:combo_box, :class_id, accessor: @item, special_value: 'None;' + $data_classes.compact.map(&:name).join(';'))
+      draw_control(:combo_box, :class_id, accessor: @item,
+                                          special_value: "None;#{$data_classes.compact.map(&:name).join(';')}")
       %i[max_level initial_level].each { |key| draw_control(:value_box, key, accessor: @item) }
 
-      draw_control(:list_view, :equips_weapon1, accessor: @item, special_value: ['None'] + @equips_weapon1.map(&:name), items: $data_weapons, sort: @equips_weapon1, index: 0)
-      draw_control(:list_view, :equips_shield, accessor: @item, special_value: ['None'] + @equips_shield.map(&:name), items: $data_armors, sort: @equips_shield, index: 1)
-      draw_control(:list_view, :equips_head, accessor: @item, special_value: ['None'] + @equips_head.map(&:name), items: $data_armors, sort: @equips_head, index: 2)
-      draw_control(:list_view, :equips_armor, accessor: @item, special_value: ['None'] + @equips_armor.map(&:name), items: $data_armors, sort: @equips_armor, index: 3)
-      draw_control(:list_view, :equips_accessory, accessor: @item, special_value: ['None'] + @equips_accessory.map(&:name), items: $data_armors, sort: @equips_accessory, index: 4)
+      draw_control(:list_view, :equips_weapon1, accessor: @item, special_value: ['None'] + @equips_weapon1.map(&:name),
+                                                items: $data_weapons, sort: @equips_weapon1, index: 0)
+      draw_control(:list_view, :equips_shield, accessor: @item, special_value: ['None'] + @equips_shield.map(&:name),
+                                               items: $data_armors, sort: @equips_shield, index: 1)
+      draw_control(:list_view, :equips_head, accessor: @item, special_value: ['None'] + @equips_head.map(&:name),
+                                             items: $data_armors, sort: @equips_head, index: 2)
+      draw_control(:list_view, :equips_armor, accessor: @item, special_value: ['None'] + @equips_armor.map(&:name),
+                                              items: $data_armors, sort: @equips_armor, index: 3)
+      draw_control(:list_view, :equips_accessory, accessor: @item,
+                                                  special_value: ['None'] + @equips_accessory.map(&:name), items: $data_armors, sort: @equips_accessory, index: 4)
     end
 
     private
@@ -85,7 +91,9 @@ module Editor
       data.compact.flat_map do |item|
         next unless item.etype_id == index || category == :weapon
 
-        $data_classes[@item.class_id].features.select { |f| f.code == code && f.data_id == item.send(type_id) }.map { item}
+        $data_classes[@item.class_id].features.select do |f|
+          f.code == code && f.data_id == item.send(type_id)
+        end.map { item }
       end.compact
     end
   end

@@ -33,8 +33,9 @@ module Editor
         remove_by_walking: { label: 'Walking', x: 0.33, y: 0.30 }
       },
       dropdown_box: {
-        restriction: { label: 'Restriction', text: "None;Attack an Enemy;Attack Anyone;Attack an Ally;Cannot Move", x: 0.15, y: 0.14 },
-        auto_removal_timing: { label: 'Timing', text: "None;Action End;Turn End", x: 0.33, y: 0.18 }
+        restriction: { label: 'Restriction', text: 'None;Attack an Enemy;Attack Anyone;Attack an Ally;Cannot Move',
+                       x: 0.15, y: 0.14 },
+        auto_removal_timing: { label: 'Timing', text: 'None;Action End;Turn End', x: 0.33, y: 0.18 }
       }
     }
 
@@ -53,17 +54,21 @@ module Editor
     def draw
       super
       @features.draw
-      [:states, :general, :removal_conditions, :message1, :message2, :message3, :message4].each { |key| draw_control(:group_box, key) }
-      [:name, :message1, :message2, :message3, :message4].each { |key| draw_control(:text_box, key, accessor: @item) }
-      [:priority].each { |key| draw_control(:value_box, key, accessor: @item) }
-      [:remove_at_battle_end, :remove_by_restriction].each { |key| draw_control(:check_box, key, accessor: @item) }
-      draw_control(:value_box, :chance_by_damage, accessor: @item) if draw_control(:check_box, :remove_by_damage, accessor: @item)
-      draw_control(:value_box, :steps_to_remove, accessor: @item) if draw_control(:check_box, :remove_by_walking, accessor: @item)
-      if STATE_CONTROLS[:dropdown_box][:auto_removal_timing][:value_index] > 0
-        [:min_turns, :max_turns].each { |key| draw_control(:value_box, key, accessor: @item) }
+      %i[states general removal_conditions message1 message2 message3 message4].each do |key|
+        draw_control(:group_box, key)
       end
-      [:restriction, :auto_removal_timing].each { |key| draw_control(:dropdown_box, key, accessor: @item) }
-      #recursive_draw_control(STATE_CONTROLS, @item)
+      %i[name message1 message2 message3 message4].each { |key| draw_control(:text_box, key, accessor: @item) }
+      [:priority].each { |key| draw_control(:value_box, key, accessor: @item) }
+      %i[remove_at_battle_end remove_by_restriction].each { |key| draw_control(:check_box, key, accessor: @item) }
+      draw_control(:value_box, :chance_by_damage, accessor: @item) if draw_control(:check_box, :remove_by_damage,
+                                                                                   accessor: @item)
+      draw_control(:value_box, :steps_to_remove, accessor: @item) if draw_control(:check_box, :remove_by_walking,
+                                                                                  accessor: @item)
+      if STATE_CONTROLS[:dropdown_box][:auto_removal_timing][:value_index].positive?
+        %i[min_turns max_turns].each { |key| draw_control(:value_box, key, accessor: @item) }
+      end
+      %i[restriction auto_removal_timing].each { |key| draw_control(:dropdown_box, key, accessor: @item) }
+      # recursive_draw_control(STATE_CONTROLS, @item)
     end
 
     def update_group(dt)

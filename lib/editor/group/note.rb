@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Editor
   class Note < Base
     attr_accessor :item
@@ -15,10 +17,6 @@ module Editor
       super
       @item = item
       initialize_properties(NOTE_CONTROLS)
-    end
-
-    def update(dt)
-      super
     end
 
     def draw

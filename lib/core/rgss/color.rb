@@ -1,13 +1,15 @@
-  class Color
-    def _dump(depth = 0)
-      @red = self.r
-      @green = self.g
-      @blue = self.b
-      @alpha = self.a
-      [@red, @green, @blue, @alpha].pack('D*')
-    end
+# frozen_string_literal: true
 
-    def self._load(string)
-      self.new(*string.unpack('D*'))
-    end
+class Color
+  def _dump(_depth = 0)
+    @red = r
+    @green = g
+    @blue = b
+    @alpha = a
+    [@red, @green, @blue, @alpha].pack('D*')
   end
+
+  def self._load(string)
+    new(*string.unpack('D*'))
+  end
+end

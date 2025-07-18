@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Editor
   class Data < Base
@@ -69,16 +70,17 @@ module Editor
       super
       Gui.group_box(DATA_CONTROLS[:group_box][:commands][:label], DATA_CONTROLS[:group_box][:commands][:rect])
       draw_list_view(:editor, Editor.list)
-      #draw_control(:list_view,
-      #:editor,
-      #special_value: Editor.list)
+      # draw_control(:list_view,
+      # :editor,
+      # special_value: Editor.list)
       result_search, @search_query = Gui.text_box(@search_query, DATA_CONTROLS[:text_box][:search][:rect],
                                                   DATA_CONTROLS[:text_box][:search][:length], @edit_modes[:search])
       @edit_modes[:search] = !@edit_modes[:search] if result_search
       @item_scroll_index, @item_index = Gui.list_view(@item_names, DATA_CONTROLS[:list_view][:item][:rect],
                                                       @item_scroll_index, @item_index)
-      @autosave = Gui.check_box(DATA_CONTROLS[:check_box][:autosave][:label], DATA_CONTROLS[:check_box][:autosave][:rect], @autosave)
-      #@autosave = draw_control(:check_box, :autosave)
+      @autosave = Gui.check_box(DATA_CONTROLS[:check_box][:autosave][:label],
+                                DATA_CONTROLS[:check_box][:autosave][:rect], @autosave)
+      # @autosave = draw_control(:check_box, :autosave)
       DATA_CONTROLS[:button].each do |symbol, properties|
         send(:"action_item_#{symbol}") if Gui.button(properties[:label], properties[:rect]) && properties[:action].nil?
       end
@@ -87,7 +89,7 @@ module Editor
       @edit_modes[:quantity] = !@edit_modes[:quantity] if result_quantity
     end
 
-    def draw_list_view(key, text, accessor = nil)
+    def draw_list_view(key, text, _accessor = nil)
       DATA_CONTROLS[:list_view][key][:scroll_index], DATA_CONTROLS[:list_view][key][:value_index] = Gui.list_view(
         text, DATA_CONTROLS[:list_view][key][:rect], DATA_CONTROLS[:list_view][key][:scroll_index], DATA_CONTROLS[:list_view][key][:value_index]
       )
@@ -106,20 +108,20 @@ module Editor
       @item_names = @items.map do |item|
         "#{item.id} - #{item.name}"
       end
-      #@items.each do |item|
-        # unless item.effects.empty? || item.effects.nil?
-        #   item.effects.each do |effect|
-        #     if effect.value1.to_s.start_with?('0.') || effect.value1.to_s.start_with?('1.0')
-        #       effect.value1 = (effect.value1 * 100).to_i
-        #     end
-        #   end
-        # end
-        # item.features.each do |feature|
-        #   if feature.value.to_s.start_with?('0.') || feature.value.to_s.start_with?('1.0')
-        #     feature.value = (feature.value * 10).to_i
-        #   end
-        # end
-      #end
+      # @items.each do |item|
+      # unless item.effects.empty? || item.effects.nil?
+      #   item.effects.each do |effect|
+      #     if effect.value1.to_s.start_with?('0.') || effect.value1.to_s.start_with?('1.0')
+      #       effect.value1 = (effect.value1 * 100).to_i
+      #     end
+      #   end
+      # end
+      # item.features.each do |feature|
+      #   if feature.value.to_s.start_with?('0.') || feature.value.to_s.start_with?('1.0')
+      #     feature.value = (feature.value * 10).to_i
+      #   end
+      # end
+      # end
       @item = @items.first
       @item_scroll_index = 0
       @item_index = 0
@@ -150,7 +152,7 @@ module Editor
     def update_keyboard
       if Mouse.button_down?(Mouse::BUTTON_LEFT)
         action_item_undo if Input.released?(:special)
-        #action_item_redo if Input.released?(:y)
+        # action_item_redo if Input.released?(:y)
         action_item_copy if Input.released?(:confirm)
         action_item_paste if Input.released?(:menu)
       end
@@ -164,10 +166,10 @@ module Editor
         @item_scroll_index += 1
         update_selected_item
       end
-      if Keyboard.released?(Keyboard::DELETE)
-        action_item_delete
-        @item_scroll_index -= 1
-      end
+      return unless Keyboard.released?(Keyboard::DELETE)
+
+      action_item_delete
+      @item_scroll_index -= 1
     end
 
     def update_search_items
@@ -345,7 +347,7 @@ module Editor
     def action_export_csv
       export_path ||= "Project/Export/#{Editor.name(DATA_CONTROLS[:list_view][:editor][:value_index])}s.csv"
       data = @items.map(&:to_h)
-      CSV.open(export_path, "wb") do |csv|
+      CSV.open(export_path, 'wb') do |csv|
         csv << data.first.keys
         data.each { |item| csv << item.values }
       end
@@ -364,9 +366,7 @@ module Editor
     def action_replace(attribute, old_value, new_value)
       save_item_state(@undo_stack)
       @items.each do |item|
-        if item.send(attribute) == old_value
-          item.send("#{attribute}=", new_value)
-        end
+        item.send("#{attribute}=", new_value) if item.send(attribute) == old_value
       end
       update_items
       puts "INFO: Replaced '#{old_value}' with '#{new_value}' in '#{attribute}' across all items."
@@ -377,7 +377,7 @@ module Editor
     end
 
     def update_selected_item
-      if @item_index < 0
+      if @item_index.negative?
         @item_index = @items.size - 1
       elsif @item_index >= @items.size
         @item_index = 0

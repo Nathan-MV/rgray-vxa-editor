@@ -13,13 +13,13 @@ module Editor
         description: { label: 'Description', accessor: true, length: 999_999_999, x: 0.15, y: 0.07, width: 0.65 }
       },
       value_box: {
-        price: { label: 'Price', accessor: true, min: 0, max: 999_999_999, x: 0.15, y: 0.18, width: 0.06 },
+        price: { label: 'Price', accessor: true, min: 0, max: 999_999_999, x: 0.15, y: 0.18, width: 0.06 }
       },
       combo_box: {
         animation_id: { label: 'Animation', accessor: true, x: 0.15, y: 0.22 }
       },
       dropdown_box: {
-        wtype_id: { label: 'Armor Type', accessor: true, x: 0.15, y: 0.14 },
+        wtype_id: { label: 'Armor Type', accessor: true, x: 0.15, y: 0.14 }
       }
     }
 
@@ -42,9 +42,11 @@ module Editor
       @parameter.draw
       %i[weapons general].each { |key| draw_control(:group_box, key) }
       %i[description name].each { |key| draw_control(:text_box, key, accessor: @item) }
-      draw_control(:combo_box, :animation_id, accessor: @item, special_value: 'None;' + $data_animations.compact.map(&:name).join(';'))
+      draw_control(:combo_box, :animation_id, accessor: @item,
+                                              special_value: "None;#{$data_animations.compact.map(&:name).join(';')}")
       draw_control(:value_box, :price, accessor: @item)
-      draw_control(:dropdown_box, :wtype_id, accessor: @item, special_value: 'None' + $data_system.weapon_types.compact.join(';'))
+      draw_control(:dropdown_box, :wtype_id, accessor: @item,
+                                             special_value: "None#{$data_system.weapon_types.compact.join(';')}")
     end
 
     private

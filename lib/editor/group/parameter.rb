@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Editor
   class Parameter < Base
     attr_accessor :item
@@ -14,8 +16,8 @@ module Editor
         params_3: { label: 'DEF', min: 1, max: 999_999_999, x: 0.73, y: 0.14 },
         params_2: { label: 'ATK', min: 1, max: 999_999_999, x: 0.60, y: 0.14 },
         params_1: { label: 'MMP', min: 1, max: 999_999_999, x: 0.47, y: 0.14 },
-        params_0: { label: 'MHP', min: 1, max: 999_999_999, x: 0.33, y: 0.14 },
-      },
+        params_0: { label: 'MHP', min: 1, max: 999_999_999, x: 0.33, y: 0.14 }
+      }
     }
 
     def initialize(item)
@@ -24,14 +26,10 @@ module Editor
       initialize_properties(PARAMETER_CONTROLS)
     end
 
-    def update(dt)
-      super
-    end
-
     def draw
       super
       draw_control(:group_box, :parameter)
-      PARAMETER_CONTROLS[:value_box].each { |key, param| draw_control(:value_box, key, accessor: @item) }
+      PARAMETER_CONTROLS[:value_box].each_key { |key| draw_control(:value_box, key, accessor: @item) }
     end
   end
 end

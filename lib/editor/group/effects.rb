@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Editor
   class Effects < Base
     attr_accessor :item
@@ -48,28 +50,28 @@ module Editor
         content: { label: 'Content', x: 0.71, y: 0.38 },
         effects_new: { label: 'New', x: 0.62, y: 0.90 },
         effects_remove: { label: 'Delete', x: 0.62, y: 0.94 }
-      },
+      }
     }
 
     CODE = {
-      11 => "Recover HP",
-      12 => "Recover MP",
-      13 => "Gain TP",
-      14 => "Gain Skill Total Charges",
-      15 => "Gain Skill Charges",
-      21 => "Add State",
-      22 => "Remove State",
-      31 => "Add Buff",
-      32 => "Add Debuff",
-      33 => "Remove Buff",
-      34 => "Remove Debuff",
-      41 => "Special Effect",
-      42 => "Grow",
-      43 => "Learn Skill",
-      44 => "Common Event",
-      45 => "Passive State", # MV Trinity
-      46 => "Enable Switch", # Custom
-      47 => "Disable Switch" # Custom
+      11 => 'Recover HP',
+      12 => 'Recover MP',
+      13 => 'Gain TP',
+      14 => 'Gain Skill Total Charges',
+      15 => 'Gain Skill Charges',
+      21 => 'Add State',
+      22 => 'Remove State',
+      31 => 'Add Buff',
+      32 => 'Add Debuff',
+      33 => 'Remove Buff',
+      34 => 'Remove Debuff',
+      41 => 'Special Effect',
+      42 => 'Grow',
+      43 => 'Learn Skill',
+      44 => 'Common Event',
+      45 => 'Passive State', # MV Trinity
+      46 => 'Enable Switch', # Custom
+      47 => 'Disable Switch' # Custom
     }.freeze
 
     def initialize(item)
@@ -82,7 +84,7 @@ module Editor
     def update(dt)
       super
       @display = @item.effects.map do |effect|
-        CODE[effect.code] || "Unknown Effect"
+        CODE[effect.code] || 'Unknown Effect'
       end
     end
 
@@ -96,30 +98,36 @@ module Editor
       when 11, 12
         draw_control(:value_box, :effects_value1, accessor: @item, index: effects_list_index)
         draw_control(:value_box, :effects_value2, accessor: @item, index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 13, 14, 15
         draw_control(:value_box, :effects_value1, accessor: @item, index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 21, 22
         draw_control(:value_box, :effects_value1, accessor: @item, index: effects_list_index)
-        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: ["Normal Attack"] + $data_states.compact.map(&:name), index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        draw_control(:list_view, :effects_data_id, accessor: @item,
+                                                   special_value: ['Normal Attack'] + $data_states.compact.map(&:name), index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 31, 32, 42
         draw_control(:value_box, :effects_value1, accessor: @item, index: effects_list_index)
-        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: $data_system.terms.params, index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: $data_system.terms.params,
+                                                   index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 33, 34
-        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: $data_system.terms.params, index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: $data_system.terms.params,
+                                                   index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 43
-        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: ["Attack"] + $data_skills.compact.map(&:name), index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        draw_control(:list_view, :effects_data_id, accessor: @item,
+                                                   special_value: ['Attack'] + $data_skills.compact.map(&:name), index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 44
-        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: ["None"] + $data_common_events.compact.map(&:name), index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        draw_control(:list_view, :effects_data_id, accessor: @item,
+                                                   special_value: ['None'] + $data_common_events.compact.map(&:name), index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       when 46, 47
-        draw_control(:list_view, :effects_data_id, accessor: @item, special_value: ["None"] + $data_system.switches.compact, index: effects_list_index)
-        #draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
+        draw_control(:list_view, :effects_data_id, accessor: @item,
+                                                   special_value: ['None'] + $data_system.switches.compact, index: effects_list_index)
+        # draw_control(:text_box, :effects_condition, accessor: @item, index: effects_list_index)
       end
       draw_control(:list_view, :effects_new, special_value: CODE.values)
       draw_control(:button, :kind)
@@ -137,14 +145,14 @@ module Editor
     end
 
     def action_effect_new
-      #save_item_state(@undo_stack)
+      # save_item_state(@undo_stack)
       @item.effects << RPG::UsableItem::Effect.new(CODE.keys[EFFECTS_CONTROLS[:list_view][:effects_new][:value_index]])
       EFFECTS_CONTROLS[:list_view][:effects][:value_index] = @item.effects.size - 1
       puts "INFO: Effect has been created. Click 'Save' to persist changes."
     end
 
     def action_effect_delete
-      #save_item_state(@undo_stack)
+      # save_item_state(@undo_stack)
       @item.effects.delete_at(effects_list_index)
       EFFECTS_CONTROLS[:list_view][:effects][:value_index] = [effects_list_index - 1, 0].max
       puts "INFO: Effect has been deleted. Click 'Save' to persist changes."

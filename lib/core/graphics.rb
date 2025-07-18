@@ -194,7 +194,6 @@ end
 
 #     alias snap_to_bitmap to_image
 
-
 #     def frame_reset; end
 
 #     alias resize_screen size

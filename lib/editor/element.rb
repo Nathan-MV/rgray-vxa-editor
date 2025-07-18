@@ -21,7 +21,10 @@ module Editor
     def draw
       super
       [:element].each { |key| draw_control(:group_box, key) }
-      [:immunities, :resistances, :weaknesses].each { |key| draw_control(:dropdown_box, key, accessor: @item, special_value: "None" + $data_system.elements.compact.join(';')) }
+      %i[immunities resistances weaknesses].each do |key|
+        draw_control(:dropdown_box, key, accessor: @item,
+                                         special_value: "None#{$data_system.elements.compact.join(';')}")
+      end
     end
   end
 end

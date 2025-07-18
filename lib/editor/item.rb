@@ -21,12 +21,13 @@ module Editor
       },
       dropdown_box: {
         occasion: { label: 'Occasion', text: 'Always;Battle;Menu;Never', accessor: true, x: 0.15, y: 0.30 },
-        scope: { label: 'Scope', text: 'None;One Enemy;All Enemies;1 Random Enemy;2 Random Enemy;3 Random Enemy;4 Random Enemy;One Ally;All Allies;One Ally (Dead);All Allies (Dead);The User', accessor: true, x: 0.15, y: 0.26 },
+        scope: { label: 'Scope',
+                 text: 'None;One Enemy;All Enemies;1 Random Enemy;2 Random Enemy;3 Random Enemy;4 Random Enemy;One Ally;All Allies;One Ally (Dead);All Allies (Dead);The User', accessor: true, x: 0.15, y: 0.26 },
         itype_id: { label: 'Item Type', text: 'None;Regular;Key', accessor: true, x: 0.15, y: 0.14 }
-      },
-      #combo_box: {
+      }
+      # combo_box: {
       #  icon_index: { label: 'Icon', accessor: true, recursive: false, x: 0.25, y: 0.03 },
-      #}
+      # }
     }
 
     def initialize
@@ -35,7 +36,7 @@ module Editor
       @damage = Damage.new(@item)
       @invocation = Invocation.new(@item)
       initialize_properties(ITEM_CONTROLS)
-      @sprite = Sprite.new("./Project/Graphics/System/iconset.png")
+      @sprite = Sprite.new('./Project/Graphics/System/iconset.png')
       @sprite_pos = Vec2.new(Graphics.screen_width * 0.28, Graphics.screen_height * 0.03)
     end
 

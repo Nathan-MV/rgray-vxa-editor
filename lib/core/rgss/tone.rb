@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Tone
   attr_accessor :red
   attr_accessor :green
@@ -5,10 +7,13 @@ class Tone
   attr_accessor :gray
 
   def initialize(red = 0, green = 0, blue = 0, gray = 0)
-    self.red, self.green, self.blue, self.gray = red, green, blue, gray
+    self.red = red
+    self.green = green
+    self.blue = blue
+    self.gray = gray
   end
 
-  def set(red, green=0, blue=0, gray=0)
+  def set(red, green = 0, blue = 0, gray = 0)
     if red.is_a? Tone
       tone   = red
       @red   = tone.red
@@ -44,7 +49,7 @@ class Tone
   end
 
   def blend(tone) # :nodoc:
-    self.clone.blend!(tone)
+    clone.blend!(tone)
   end
 
   def blend!(tone) # :nodoc:
@@ -55,7 +60,7 @@ class Tone
     self
   end
 
-  def _dump(marshal_depth = -1) # :nodoc:
+  def _dump(_marshal_depth = -1) # :nodoc:
     [@red, @green, @blue, @gray].pack('E4')
   end
 

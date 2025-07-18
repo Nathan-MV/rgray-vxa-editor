@@ -13,7 +13,7 @@ module Editor
         description: { label: 'Description', length: 999_999_999, x: 0.15, y: 0.07, width: 0.65 }
       },
       value_box: {
-        price: { label: 'Price', min: 0, max: 999_999_999, x: 0.15, y: 0.18, width: 0.06 },
+        price: { label: 'Price', min: 0, max: 999_999_999, x: 0.15, y: 0.18, width: 0.06 }
       },
       dropdown_box: {
         atype_id: { label: 'Armor Type', x: 0.15, y: 0.22 },

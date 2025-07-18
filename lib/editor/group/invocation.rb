@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Editor
   class Invocation < Base
     attr_accessor :item
@@ -25,17 +27,14 @@ module Editor
       initialize_properties(INVOCATION_CONTROLS)
     end
 
-    def update(dt)
-      super
-    end
-
     def draw
       super
       draw_control(:group_box, :invocation)
-      draw_control(:combo_box, :animation_id, accessor: @item, special_value: 'None;' + $data_animations.compact.map(&:name).join(';'))
+      draw_control(:combo_box, :animation_id, accessor: @item,
+                                              special_value: "None;#{$data_animations.compact.map(&:name).join(';')}")
       draw_control(:dropdown_box, :hit_type, accessor: @item)
       draw_control(:value_box, :repeats, accessor: @item)
-      draw_control(:value_box, :success_rate, accessor: @item, special_value: "%")
+      draw_control(:value_box, :success_rate, accessor: @item, special_value: '%')
       draw_control(:value_box, :speed, accessor: @item)
     end
   end

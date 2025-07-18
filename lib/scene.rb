@@ -37,7 +37,7 @@ module Scene
     def goto(scene_class)
       @old_scene << scene_class
       @scene = scene_class.new
-      #save_scene_state
+      # save_scene_state
     end
 
     # Call

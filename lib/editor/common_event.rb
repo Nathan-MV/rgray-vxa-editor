@@ -10,14 +10,14 @@ module Editor
         contents: { label: 'Contents', x: 0.27, y: 0.12, width: 0.53, height: 0.86 }
       },
       text_box: {
-        name: { label: 'Name', length: 999_999_999, x: 0.15, y: 0.05 },
+        name: { label: 'Name', length: 999_999_999, x: 0.15, y: 0.05 }
       },
       list_view: {
         list: { label: '', x: 0.28, y: 0.14, width: 0.51, height: 0.83 }
       },
       dropdown_box: {
         trigger: { label: 'Trigger', text: 'None;Autorun;Parallel Process', x: 0.32, y: 0.05 },
-        switch_id: { label: 'Switch', text: "None;" + $data_system.switches.compact.join(';'), x: 0.49, y: 0.05 }
+        switch_id: { label: 'Switch', text: "None;#{$data_system.switches.compact.join(';')}", x: 0.49, y: 0.05 }
       }
     }
 
@@ -45,12 +45,12 @@ module Editor
 
     def draw
       super
-      [:common_event, :general, :commands, :contents].each { |key| draw_control(:group_box, key) }
+      %i[common_event general commands contents].each { |key| draw_control(:group_box, key) }
       [:name].each { |key| draw_control(:text_box, key, accessor: @item) }
       draw_control(:list_view, :list, special_value: @display)
-      if draw_control(:dropdown_box, :trigger, accessor: @item) >= 1
-        draw_control(:dropdown_box, :switch_id, accessor: @item)
-      end
+      return unless draw_control(:dropdown_box, :trigger, accessor: @item) >= 1
+
+      draw_control(:dropdown_box, :switch_id, accessor: @item)
     end
 
     def format_event(list)
@@ -60,7 +60,7 @@ module Editor
       when 401 then "#{CODE[list.code]} #{list.parameters[0]}"
       when 402 then "#{CODE[list.code]} [#{list.parameters[1]}]"
       else
-        CODE[list.code] || ""
+        CODE[list.code] || ''
       end
     end
 
@@ -75,13 +75,13 @@ module Editor
     end
 
     def action_event_new
-      #save_item_state(@undo_stack)
+      # save_item_state(@undo_stack)
       @item.list << RPG::EventCommand.new(CODE.keys[COMMON_EVENT_CONTROLS[:list_view][:list][:value_index]], 0, [])
       puts "INFO: Event has been created. Click 'Save' to persist changes."
     end
 
     def action_event_delete
-      #save_item_state(@undo_stack)
+      # save_item_state(@undo_stack)
       @item.list.delete_at(list_index)
       puts "INFO: Event has been deleted. Click 'Save' to persist changes."
     end

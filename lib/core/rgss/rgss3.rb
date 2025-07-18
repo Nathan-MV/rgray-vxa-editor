@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RPG
   class Map
     class Encounter
@@ -244,7 +246,7 @@ module RPG
       @character_index = 0
       @face_name = ''
       @face_index = 0
-      @equips = [0,0,0,0,0]
+      @equips = [0, 0, 0, 0, 0]
     end
     attr_accessor :nickname
     attr_accessor :class_id
@@ -271,13 +273,13 @@ module RPG
 
     def initialize
       super
-      @exp_params = [30,20,30,30]
-      @params = Table.new(8,100)
+      @exp_params = [30, 20, 30, 30]
+      @params = Table.new(8, 100)
       (1..99).each do |i|
-        @params[0,i] = 400+i*50
-        @params[1,i] = 80+i*10
-        (2..5).each {|j| @params[j,i] = 15+i*5/4 }
-        (6..7).each {|j| @params[j,i] = 30+i*5/2 }
+        @params[0, i] = 400 + (i * 50)
+        @params[1, i] = 80 + (i * 10)
+        (2..5).each { |j| @params[j, i] = 15 + (i * 5 / 4) }
+        (6..7).each { |j| @params[j, i] = 30 + (i * 5 / 2) }
       end
       @learnings = []
       @features.push(BaseItem::Feature.new(23, 0, 1))
@@ -288,14 +290,15 @@ module RPG
       @features.push(BaseItem::Feature.new(51, 1))
       @features.push(BaseItem::Feature.new(52, 1))
     end
+
     def exp_for_level(level)
       lv = level.to_f
       basis = @exp_params[0].to_f
       extra = @exp_params[1].to_f
       acc_a = @exp_params[2].to_f
       acc_b = @exp_params[3].to_f
-      return (basis*((lv-1)**(0.9+acc_a/250))*lv*(lv+1)/
-        (6+lv**2/50/acc_b)+(lv-1)*extra).round.to_i
+      ((basis * ((lv - 1)**(0.9 + (acc_a / 250))) * lv * (lv + 1) /
+        (6 + ((lv**2) / 50 / acc_b))) + ((lv - 1) * extra)).round.to_i
     end
     attr_accessor :exp_params
     attr_accessor :params
@@ -311,26 +314,35 @@ module RPG
         @variance = 20
         @critical = false
       end
+
       def none?
-        @type == 0
+        @type.zero?
       end
+
       def to_hp?
-        [1,3,5].include?(@type)
+        [1, 3, 5].include?(@type)
       end
+
       def to_mp?
-        [2,4,6].include?(@type)
+        [2, 4, 6].include?(@type)
       end
+
       def recover?
-        [3,4].include?(@type)
+        [3, 4].include?(@type)
       end
+
       def drain?
-        [5,6].include?(@type)
+        [5, 6].include?(@type)
       end
+
       def sign
         recover? ? -1 : 1
       end
-      def eval(a, b, v)
-        [Kernel.eval(@formula), 0].max * sign rescue 0
+
+      def eval(_a, _b, _v)
+        [Kernel.eval(@formula), 0].max * sign
+      rescue StandardError
+        0
       end
       attr_accessor :type
       attr_accessor :element_id
@@ -365,45 +377,59 @@ module RPG
       @damage = Damage.new
       @effects = []
     end
+
     def for_opponent?
       [1, 2, 3, 4, 5, 6].include?(@scope)
     end
+
     def for_friend?
       [7, 8, 9, 10, 11].include?(@scope)
     end
+
     def for_dead_friend?
       [9, 10].include?(@scope)
     end
+
     def for_user?
       @scope == 11
     end
+
     def for_one?
       [1, 3, 7, 9, 11].include?(@scope)
     end
+
     def for_random?
       [3, 4, 5, 6].include?(@scope)
     end
+
     def number_of_targets
       for_random? ? @scope - 2 : 0
     end
+
     def for_all?
       [2, 8, 10].include?(@scope)
     end
+
     def need_selection?
       [1, 7, 9].include?(@scope)
     end
+
     def battle_ok?
       [0, 1].include?(@occasion)
     end
+
     def menu_ok?
       [0, 2].include?(@occasion)
     end
+
     def certain?
-      @hit_type == 0
+      @hit_type.zero?
     end
+
     def physical?
       @hit_type == 1
     end
+
     def magical?
       @hit_type == 2
     end
@@ -448,6 +474,7 @@ module RPG
       @price = 0
       @consumable = true
     end
+
     def key_item?
       @itype_id == 2
     end
@@ -476,8 +503,9 @@ module RPG
       @features.push(BaseItem::Feature.new(31, 1, 0))
       @features.push(BaseItem::Feature.new(22, 0, 0))
     end
+
     def performance
-      params[2] + params[4] + params.inject(0) {|r, v| r += v }
+      params[2] + params[4] + params.sum
     end
     attr_accessor :wtype_id
     attr_accessor :animation_id
@@ -490,8 +518,9 @@ module RPG
       @etype_id = 1
       @features.push(BaseItem::Feature.new(22, 1, 0))
     end
+
     def performance
-      params[3] + params[5] + params.inject(0) {|r, v| r += v }
+      params[3] + params[5] + params.sum
     end
     attr_accessor :atype_id
   end
@@ -527,7 +556,7 @@ module RPG
       super
       @battler_name = ''
       @battler_hue = 0
-      @params = [100,0,10,10,10,10,10,10]
+      @params = [100, 0, 10, 10, 10, 10, 10, 10]
       @exp = 0
       @gold = 0
       @drop_items = Array.new(3) { DropItem.new }
@@ -662,7 +691,7 @@ module RPG
         @frame = 0
         @se = SE.new('', 80)
         @flash_scope = 0
-        @flash_color = Color.new(255,255,255,255)
+        @flash_color = Color.new(255, 255, 255, 255)
         @flash_duration = 5
       end
       attr_accessor :frame
@@ -684,6 +713,7 @@ module RPG
       @frames = [Frame.new]
       @timings = []
     end
+
     def to_screen?
       @position == 3
     end
@@ -704,11 +734,11 @@ module RPG
       @id = 0
       @mode = 1
       @name = ''
-      @tileset_names = Array.new(9).collect{''}
+      @tileset_names = Array.new(9).collect { '' }
       @flags = Table.new(8192)
       @flags[0] = 0x0010
-      (2048..2815).each {|i| @flags[i] = 0x000F}
-      (4352..8191).each {|i| @flags[i] = 0x000F}
+      (2048..2815).each { |i| @flags[i] = 0x000F }
+      (4352..8191).each { |i| @flags[i] = 0x000F }
       @note = ''
     end
     attr_accessor :id
@@ -727,9 +757,11 @@ module RPG
       @switch_id = 1
       @list = [EventCommand.new]
     end
+
     def autorun?
       @trigger == 1
     end
+
     def parallel?
       @trigger == 2
     end
@@ -760,10 +792,10 @@ module RPG
 
     class Terms
       def initialize
-        @basic = Array.new(8) {''}
-        @params = Array.new(8) {''}
-        @etypes = Array.new(5) {''}
-        @commands = Array.new(23) {''}
+        @basic = Array.new(8) { '' }
+        @params = Array.new(8) { '' }
+        @etypes = Array.new(5) { '' }
+        @commands = Array.new(23) { '' }
       end
       attr_accessor :basic
       attr_accessor :params
@@ -775,7 +807,7 @@ module RPG
       def initialize
         @actor_id = 1
         @level = 1
-        @equips = [0,0,0,0,0]
+        @equips = [0, 0, 0, 0, 0]
       end
       attr_accessor :actor_id
       attr_accessor :level
@@ -807,7 +839,7 @@ module RPG
       @opt_floor_death = false
       @opt_display_tp = true
       @opt_extra_exp = false
-      @window_tone = Tone.new(0,0,0)
+      @window_tone = Tone.new(0, 0, 0)
       @title_bgm = BGM.new
       @battle_bgm = BGM.new
       @battle_end_me = ME.new
@@ -886,21 +918,25 @@ module RPG
         Audio.bgm_stop
         @@last = BGM.new
       else
-        Audio.bgm_play('Audio/BGM/' + @name, @volume, @pitch, pos)
-        @@last = self.clone
+        Audio.bgm_play("Audio/BGM/#{@name}", @volume, @pitch, pos)
+        @@last = clone
       end
     end
+
     def replay
       play(@pos)
     end
+
     def self.stop
       Audio.bgm_stop
       @@last = BGM.new
     end
+
     def self.fade(time)
       Audio.bgm_fade(time)
       @@last = BGM.new
     end
+
     def self.last
       @@last.pos = Audio.bgm_pos
       @@last
@@ -915,21 +951,25 @@ module RPG
         Audio.bgs_stop
         @@last = BGS.new
       else
-        Audio.bgs_play('Audio/BGS/' + @name, @volume, @pitch, pos)
-        @@last = self.clone
+        Audio.bgs_play("Audio/BGS/#{@name}", @volume, @pitch, pos)
+        @@last = clone
       end
     end
+
     def replay
       play(@pos)
     end
+
     def self.stop
       Audio.bgs_stop
       @@last = BGS.new
     end
+
     def self.fade(time)
       Audio.bgs_fade(time)
       @@last = BGS.new
     end
+
     def self.last
       @@last.pos = Audio.bgs_pos
       @@last
@@ -942,12 +982,14 @@ module RPG
       if @name.empty?
         Audio.me_stop
       else
-        Audio.me_play('Audio/ME/' + @name, @volume, @pitch)
+        Audio.me_play("Audio/ME/#{@name}", @volume, @pitch)
       end
     end
+
     def self.stop
       Audio.me_stop
     end
+
     def self.fade(time)
       Audio.me_fade(time)
     end
@@ -955,13 +997,13 @@ module RPG
 
   class SE < AudioFile
     def play
-      unless @name.empty?
-        Audio.se_play('Audio/SE/' + @name, @volume, @pitch)
-      end
+      return if @name.empty?
+
+      Audio.se_play("Audio/SE/#{@name}", @volume, @pitch)
     end
+
     def self.stop
       Audio.se_stop
     end
   end
-
 end

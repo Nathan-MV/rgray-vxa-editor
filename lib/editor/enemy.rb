@@ -43,7 +43,7 @@ module Editor
     end
 
     def unload
-      #@sprite.unload
+      # @sprite.unload
     end
 
     private
@@ -73,9 +73,9 @@ module Editor
     end
 
     def draw_controls
-      ENEMY_CONTROLS[:group_box].keys.each { |key| draw_control(:group_box, key) }
-      ENEMY_CONTROLS[:text_box].keys.each { |key| draw_control(:text_box, key, accessor: @item) }
-      ENEMY_CONTROLS[:value_box].keys.each { |key| draw_control(:value_box, key, accessor: @item) }
+      ENEMY_CONTROLS[:group_box].each_key { |key| draw_control(:group_box, key) }
+      ENEMY_CONTROLS[:text_box].each_key { |key| draw_control(:text_box, key, accessor: @item) }
+      ENEMY_CONTROLS[:value_box].each_key { |key| draw_control(:value_box, key, accessor: @item) }
     end
   end
 end

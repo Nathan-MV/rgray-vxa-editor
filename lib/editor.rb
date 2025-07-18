@@ -6,7 +6,9 @@ module Editor
   @transition = { active: false, alpha: 0, speed: 0.05, fade_in: true }
 
   class << self
-    attr_accessor :registered, :index, :transition
+    attr_accessor :registered
+    attr_accessor :index
+    attr_accessor :transition
 
     def register(type, klass, rpg, filename)
       registered << { type:, klass:, rpg:, filename:, method: nil }
@@ -34,34 +36,32 @@ module Editor
     end
 
     def update
-      if transition[:active]
-        if transition[:fade_in]
-          transition[:alpha] -= transition[:speed]
-          transition[:alpha] = 0 if transition[:alpha] <= 0
-          if transition[:alpha] == 0
-            transition[:active] = false
-          end
-        else
-          transition[:alpha] += transition[:speed]
-          if transition[:alpha] >= 1.0
-            transition[:alpha] = 1.0
-            Scene.unload
-            Scene.goto(registered[index][:klass])
-            transition[:fade_in] = true # Start fading in after switching scene
-          end
+      return unless transition[:active]
+
+      if transition[:fade_in]
+        transition[:alpha] -= transition[:speed]
+        transition[:alpha] = 0 if transition[:alpha] <= 0
+        transition[:active] = false if transition[:alpha].zero?
+      else
+        transition[:alpha] += transition[:speed]
+        if transition[:alpha] >= 1.0
+          transition[:alpha] = 1.0
+          Scene.unload
+          Scene.goto(registered[index][:klass])
+          transition[:fade_in] = true # Start fading in after switching scene
         end
       end
     end
 
     def draw
-      if transition[:active]
-        @opacity = (transition[:alpha] * 255).to_i
-        @rect.draw(Color.new(0, 0, 0, @opacity))
-      end
+      return unless transition[:active]
+
+      @opacity = (transition[:alpha] * 255).to_i
+      @rect.draw(Color.new(0, 0, 0, @opacity))
     end
 
     def current?(type)
-      #return false unless index
+      # return false unless index
 
       registered[index][:type] == type
     end
@@ -133,5 +133,5 @@ module Editor
   register(:enemies, Enemy, RPG::Enemy, 'Enemies.rvdata2')
   register(:states, State, RPG::State, 'States.rvdata2')
   register(:common_event, CommonEvent, RPG::CommonEvent, 'CommonEvents.rvdata2')
-  #register(:elements, Element, RPG::System, 'System.rvdata2', 'elements.compact')
+  # register(:elements, Element, RPG::System, 'System.rvdata2', 'elements.compact')
 end

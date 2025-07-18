@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
 def load_normal_database
-  $data_actors        = load_data("Project/Data/Actors.rvdata2")
-  $data_classes       = load_data("Project/Data/Classes.rvdata2")
-  $data_skills        = load_data("Project/Data/Skills.rvdata2")
-  $data_items         = load_data("Project/Data/Items.rvdata2")
-  $data_weapons       = load_data("Project/Data/Weapons.rvdata2")
-  $data_armors        = load_data("Project/Data/Armors.rvdata2")
-  $data_enemies       = load_data("Project/Data/Enemies.rvdata2")
-  $data_troops        = load_data("Project/Data/Troops.rvdata2")
-  $data_states        = load_data("Project/Data/States.rvdata2")
-  $data_animations    = load_data("Project/Data/Animations.rvdata2")
-  #$data_tilesets      = load_data("Project/Data/Tilesets.rvdata2")
-  $data_common_events = load_data("Project/Data/CommonEvents.rvdata2")
-  $data_system        = load_data("Project/Data/System.rvdata2")
-  #$data_mapinfos      = load_data("Project/Data/MapInfos.rvdata2")
+  $data_actors        = load_data('Project/Data/Actors.rvdata2')
+  $data_classes       = load_data('Project/Data/Classes.rvdata2')
+  $data_skills        = load_data('Project/Data/Skills.rvdata2')
+  $data_items         = load_data('Project/Data/Items.rvdata2')
+  $data_weapons       = load_data('Project/Data/Weapons.rvdata2')
+  $data_armors        = load_data('Project/Data/Armors.rvdata2')
+  $data_enemies       = load_data('Project/Data/Enemies.rvdata2')
+  $data_troops        = load_data('Project/Data/Troops.rvdata2')
+  $data_states        = load_data('Project/Data/States.rvdata2')
+  $data_animations    = load_data('Project/Data/Animations.rvdata2')
+  # $data_tilesets      = load_data("Project/Data/Tilesets.rvdata2")
+  $data_common_events = load_data('Project/Data/CommonEvents.rvdata2')
+  $data_system        = load_data('Project/Data/System.rvdata2')
+  # $data_mapinfos      = load_data("Project/Data/MapInfos.rvdata2")
 end
 GAME_PATH = './'
 module Game
@@ -69,7 +69,7 @@ module Game
       log :info, 'Shutting down gracefully...'
       Scene.unload
       Graphics.close
-      log :info, "Shutdown complete."
+      log :info, 'Shutdown complete.'
     end
 
     def warning(stage, e)
@@ -101,12 +101,12 @@ begin
 
   # Replace the default load path with specific directories
   $LOAD_PATH.clear
-  $LOAD_PATH.concat([
+  $LOAD_PATH.push(
     "#{Game::DEV_SCRIPTS_DIR}/stdlib",
     "#{Game::DEV_SCRIPTS_DIR}/stdlib/x64-mingw-ucrt",
     "#{Game::DEV_SCRIPTS_DIR}/gems",
-    "#{Game::CORE_SCRIPTS_DIR}",
-  ])
+    Game::CORE_SCRIPTS_DIR.to_s
+  )
 
   # Load ruby gems for development
   %w[zeitwerk].each { |file| require file }

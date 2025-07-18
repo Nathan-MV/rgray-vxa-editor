@@ -1,0 +1,48 @@
+# This is the configuration used to check the rubocop source code.
+require:
+  - rubocop/cop/internal_affairs
+  - rubocop-packaging
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-thread_safety
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'scripts/dev/gems'
+    - 'scripts/dev/stdlib'
+  TargetRubyVersion: 3.4
+  SuggestExtensions: true
+
+# Layout
+Layout/ExtraSpacing:
+  AllowForAlignment: true
+  AllowBeforeTrailingComments: true
+
+# Lint
+
+# Metrics
+
+# Naming
+
+# Security
+Security/Eval:
+  Enabled: false
+Security/JSONLoad:
+  Enabled: false
+Security/MarshalLoad:
+  Enabled: false
+Security/YAMLLoad:
+  Enabled: false
+
+# Style
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+Style/Encoding:
+  Enabled: false
+Style/AccessorGrouping:
+  EnforcedStyle: separated
+Style/MutableConstant:
+  Enabled: false
+
+# Performance
