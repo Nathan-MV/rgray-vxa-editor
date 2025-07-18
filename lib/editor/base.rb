@@ -23,7 +23,7 @@ module Editor
     end
 
     def update(dt)
-      update_properties_on_resize if Graphics.resized?
+      update_properties_on_resize if Graphics.resized
       %i[TEXTBOX VALUEBOX DROPDOWNBOX LISTVIEW].each do |control|
         Gui.set_style(Gui.const_get(control), Gui::TEXT_ALIGNMENT, Gui::TEXT_ALIGN_LEFT)
       end

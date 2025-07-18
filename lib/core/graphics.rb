@@ -8,6 +8,7 @@ module Graphics
     attr_reader :default_height
     attr_reader :scale
     attr_reader :brightness
+    attr_reader :resized
 
     def setup
       config_flags
@@ -20,6 +21,7 @@ module Graphics
       update_fadein if @fadein_elapsed_time && @fadein_elapsed_time < @fadein_duration
       update_transition if @transitioning
       @fps = !@fps if Input.released?(:f2)
+      @resized = Graphics.screen_width != @width || Graphics.screen_height != @height
     end
 
     def draw
@@ -72,10 +74,6 @@ module Graphics
     end
     alias snap snap_to_bitmap
 
-    def resized?
-      @width != @default_width || @height != @default_height
-    end
-
     private
 
     def config_flags
@@ -104,6 +102,7 @@ module Graphics
       self.scale = Settings::WINDOW[:integer_scale]
       @brightness = 255
       @fps = true
+      @resized = false
       init(@width, @height, Settings::WINDOW[:title])
       # self.target_fps = refresh_rate(current_monitor)
       self.exit_key = 0
