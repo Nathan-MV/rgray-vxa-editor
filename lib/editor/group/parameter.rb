@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Parameter group
+#--------------------------------------------------------------------------
+
 module Editor
   class Parameter < Base
     attr_accessor :item

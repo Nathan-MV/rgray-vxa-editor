@@ -30,13 +30,12 @@ module Game
       @loader.push_dir(ROOT_SCRIPTS_DIR)
       @loader.collapse("#{ROOT_SCRIPTS_DIR}/editor/group")
       @loader.setup
-      Editor.select(:item)
       Graphics.setup
+      Editor.select(:item)
 
       until Graphics.should_close?
         safely('Update') do
           Scene.update(Graphics.frame_time)
-          Editor.update
         end
         Graphics.update
 
@@ -44,7 +43,6 @@ module Game
           Graphics.clear(Color.new(255, 255, 255))
           safely('Draw') do
             Scene.draw
-            Editor.draw
           end
           Graphics.draw
         end

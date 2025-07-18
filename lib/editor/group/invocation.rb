@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Invocation group
+#--------------------------------------------------------------------------
+
 module Editor
   class Invocation < Base
     attr_accessor :item

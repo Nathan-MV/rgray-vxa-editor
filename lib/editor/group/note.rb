@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Note group
+#     Not being used because RayGUi doesn't support multiline text boxes
+#--------------------------------------------------------------------------
+
 module Editor
   class Note < Base
     attr_accessor :item

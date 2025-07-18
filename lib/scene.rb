@@ -9,8 +9,6 @@ module Scene
   # Module Instance Variables
   @scene = nil # current scene object
   @stack = [] # stack for hierarchical transitions
-  @old_scene = []
-  @scene_file = "#{GAME_PATH}.tmp/last_scene.json".freeze # file to store the last scene
 
   class << self
     # Get Current Scene
@@ -35,7 +33,6 @@ module Scene
 
     # Direct Transition
     def goto(scene_class)
-      @old_scene << scene_class
       @scene = scene_class.new
       # save_scene_state
     end
@@ -60,25 +57,6 @@ module Scene
     # Exit Game
     def exit
       @scene = nil
-    end
-
-    def save_scene_state
-      File.write(@scene_file, { scene: @scene.class.name, editor_index: Editor.index }.to_json)
-    end
-
-    def load_last_scene
-      return unless File.exist?(@scene_file)
-
-      data = JSON.parse(File.read(@scene_file), symbolize_names: true)
-      scene_class = Object.const_get(data[:scene])
-      return unless scene_class
-
-      if editor_scene?(data[:scene])
-        Editor.index = data[:editor_index]
-        Editor.select(Editor.index)
-      else
-        goto(scene_class)
-      end
     end
 
     def editor_scene?(class_name)

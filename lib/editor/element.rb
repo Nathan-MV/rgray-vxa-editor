@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Element editor plugin (incomplete)
+#--------------------------------------------------------------------------
+
 module Editor
   class Element < Data
     ELEMENT_CONTROLS = {

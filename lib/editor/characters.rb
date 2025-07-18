@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Character editor (incomplete)
+#--------------------------------------------------------------------------
+
 module Editor
   class Characters < Base
     TEMPLATE = {

@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Weapon editor
+#--------------------------------------------------------------------------
+
 module Editor
   class Weapon < Data
     WEAPON_CONTROLS = {

@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Editor
+#--------------------------------------------------------------------------
+
 module Editor
   @registered = []
   @index = nil
-  @transition = { active: false, alpha: 0, speed: 0.05, fade_in: true }
 
   class << self
     attr_accessor :registered
     attr_accessor :index
-    attr_accessor :transition
 
     def register(type, klass, rpg, filename)
       registered << { type:, klass:, rpg:, filename:, method: nil }
@@ -19,49 +21,15 @@ module Editor
       self.index = resolve_index(arg)
 
       if index
-        start_transition
+        Scene.unload
+        Scene.goto(registered[index][:klass])
         puts "Selecting editor: #{registered[index][:type]}, resolved index: #{index}"
       elsif arg.is_a?(Integer)
         puts "Invalid index: #{arg}"
       end
     end
 
-    def start_transition
-      transition[:active] = true
-      transition[:alpha] = 0
-      transition[:fade_in] = false # Start fading out
-      @opacity = 255
-      @color = Color.new(0, 0, 0, @opacity)
-      @rect = Rect.new(107, 0, Graphics.screen_width, Graphics.screen_height - 8, @color)
-    end
-
-    def update
-      return unless transition[:active]
-
-      if transition[:fade_in]
-        transition[:alpha] -= transition[:speed]
-        transition[:alpha] = 0 if transition[:alpha] <= 0
-        transition[:active] = false if transition[:alpha].zero?
-      else
-        transition[:alpha] += transition[:speed]
-        if transition[:alpha] >= 1.0
-          transition[:alpha] = 1.0
-          Scene.unload
-          Scene.goto(registered[index][:klass])
-          transition[:fade_in] = true # Start fading in after switching scene
-        end
-      end
-    end
-
-    def draw
-      return unless transition[:active]
-
-      @opacity = (transition[:alpha] * 255).to_i
-      @rect.draw(Color.new(0, 0, 0, @opacity))
-    end
-
     def current?(type)
-      # return false unless index
 
       registered[index][:type] == type
     end

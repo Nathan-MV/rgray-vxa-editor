@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Damage group
+#--------------------------------------------------------------------------
+
 module Editor
   class Damage < Base
     attr_accessor :item

@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Common Event editor (incomplete)
+#--------------------------------------------------------------------------
+
 module Editor
   class CommonEvent < Data
     COMMON_EVENT_CONTROLS = {

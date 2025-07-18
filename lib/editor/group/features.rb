@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Features group
+#--------------------------------------------------------------------------
+
 module Editor
   class Features < Base
     attr_accessor :item

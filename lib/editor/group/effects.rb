@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+#--------------------------------------------------------------------------
+# * Effects group
+#--------------------------------------------------------------------------
+
 module Editor
   class Effects < Base
     attr_accessor :item
