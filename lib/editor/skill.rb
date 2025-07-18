@@ -63,10 +63,10 @@ module Editor
 
     def draw
       super
-      @damage.draw
-      @results = recursive_draw_control(SKILL_CONTROLS, @item)
-      @effects.draw
       @invocation.draw
+      @results = recursive_draw_control(SKILL_CONTROLS, @item)
+      @damage.draw
+      @effects.draw
     end
 
     def update_group(dt)
