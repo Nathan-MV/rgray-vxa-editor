@@ -58,11 +58,7 @@ module Editor
       super
       update_group(dt)
       update_group_item
-      return unless @results
-
-      @results.each do |entry|
-        update_message(entry[:key]) if %i[casts does uses].include?(entry[:key])
-      end
+      update_messages
     end
 
     def draw
@@ -74,19 +70,23 @@ module Editor
     end
 
     def update_group(dt)
-      @effects.update(dt)
-      @damage.update(dt)
-      @invocation.update(dt)
+      [@effects, @damage, @invocation].each { |c| c.update(dt) }
     end
 
     def update_group_item
-      @effects.item = @item
-      @damage.item = @item
-      @invocation.item = @item
+      [@effects, @damage, @invocation].each { |c| c.item = @item }
     end
 
-    def update_message(symbol)
-      @item.message1 = "#{symbol} #{@item.name}!"
+    def update_messages
+      (@results || []).each do |entry|
+        set_message(entry[:key]) if %i[casts does uses].include?(entry[:key])
+      end
+    end
+
+    def set_message(symbol)
+      label = SKILL_CONTROLS[:button][symbol][:label]
+      message = label.gsub('*', @item.name).gsub('"', '')
+      @item.message1 = message
     end
   end
 end
@@ -128,5 +128,46 @@ module Editor
       { label: 'TP', label_beside: true, accessor: true, min: 0, max: 999_999_999, x: 0.22, y: 0.18, width: 0.03 }
     SKILL_CONTROLS[:value_box][:total_charges] =
       { label: 'Charges', accessor: true, min: 0, max: 100, x: 0.15, y: 0.22, width: 0.03 }
+  end
+end
+
+#--------------------------------------------------------------------------
+# * Plugin: Extra Auto Messages (Auto Rows of 3)
+#--------------------------------------------------------------------------
+
+module Editor
+  class Skill < Data
+    EXTRA_MESSAGES = {
+      strikes: '"strikes *!"',
+      fires: '"fires *!"',
+      summons: '"summons *!"',
+      unleashes: '"unleashes *!"',
+      flees: '"flees"'
+    }
+
+    BUTTON_LAYOUT = {
+      x: 0.28, y: 0.50, width: 0.065, dx: 0.078, dy: 0.04, per_row: 3
+    }
+
+    # Adjust group box height
+    rows = (EXTRA_MESSAGES.size + BUTTON_LAYOUT[:per_row] - 1) / BUTTON_LAYOUT[:per_row]
+    SKILL_CONTROLS[:group_box][:using_message][:height] = 0.14 + rows * BUTTON_LAYOUT[:dy]
+
+    # Generate buttons
+    EXTRA_MESSAGES.each_with_index do |(key, label), i|
+      r, c = i.divmod(BUTTON_LAYOUT[:per_row])
+      SKILL_CONTROLS[:button][key] = {
+        label:, tooltip: 'Automatically makes the message',
+        x: BUTTON_LAYOUT[:x] + c * BUTTON_LAYOUT[:dx],
+        y: BUTTON_LAYOUT[:y] + r * BUTTON_LAYOUT[:dy],
+        width: BUTTON_LAYOUT[:width]
+      }
+    end
+
+    alias plugin_update_messages update_messages
+    def update_messages
+      plugin_update_messages
+      @results&.each { |e| set_message(e[:key]) if EXTRA_MESSAGES.key?(e[:key]) }
+    end
   end
 end

@@ -19,7 +19,7 @@ module Editor
     }
 
     def initialize(*args)
-      Gui.enable_tooltip
+      #Gui.enable_tooltip
     end
 
     def update(dt)
