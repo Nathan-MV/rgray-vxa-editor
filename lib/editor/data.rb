@@ -187,8 +187,34 @@ module Editor
         @item_scroll_index += 1
         update_selected_item
       end
+      if Keyboard.released?(Keyboard::HOME)
+        @item_index -= @items.size
+        @item_scroll_index -= @items.size
+        update_selected_item
+      end
+      if Keyboard.released?(Keyboard::END)
+        @item_index += @items.size
+        @item_scroll_index += @items.size
+        update_selected_item
+      end
+      if Keyboard.released?(Keyboard::PAGE_UP)
+        @item_index -= 20
+        @item_scroll_index -= 20
+        update_selected_item
+      end
+      if Keyboard.released?(Keyboard::PAGE_DOWN)
+        @item_index += 20
+        @item_scroll_index += 20
+        update_selected_item
+      end
+      if Keyboard.released?(Keyboard::INSERT)
+        action_item_new_below
+        @item_index += 1
+        @item_scroll_index += 1
+      end
       if Keyboard.released?(Keyboard::DELETE)
         action_item_delete
+        item_index -= 1
         @item_scroll_index -= 1
       end
     end
