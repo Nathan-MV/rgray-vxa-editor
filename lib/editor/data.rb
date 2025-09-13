@@ -166,8 +166,9 @@ module Editor
 
     def update_items
       @item = @items[@item_index]
-      update_item_names_and_cache
+      update_item_names_and_cache if @items_changed
       DATA_CONTROLS[:button][:quantity][:label] = "Quantity - #{@items.length}"
+      @items_changed = false
     end
 
     def update_keyboard
