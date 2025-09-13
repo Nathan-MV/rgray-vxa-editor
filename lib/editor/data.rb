@@ -176,6 +176,14 @@ module Editor
         action_item_redo if Keyboard.released?(Keyboard::Y)
         action_item_copy if Keyboard.released?(Keyboard::C)
         action_item_paste if Keyboard.released?(Keyboard::V)
+        if Keyboard.released?(Keyboard::UP)
+          action_item_move_up
+          @item_index += 1
+        end
+        if Keyboard.released?(Keyboard::DOWN)
+          action_item_move_down
+          @item_index -= 1
+        end
       end
       if Keyboard.released?(Keyboard::UP)
         @item_index -= 1
