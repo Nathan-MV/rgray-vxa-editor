@@ -20,13 +20,13 @@ module Graphics
       update_fadeout if @fadeout_elapsed_time && @fadeout_elapsed_time < @fadeout_duration
       update_fadein if @fadein_elapsed_time && @fadein_elapsed_time < @fadein_duration
       update_transition if @transitioning
-      @fps = !@fps if Input.released?(:f2)
+      @draw_fps = !@draw_fps if Input.released?(:f2)
       @resized = Graphics.screen_width != @width || Graphics.screen_height != @height
     end
 
     def draw
       @rect.draw(Color.new(255, 255, 255, 255 - @brightness)) unless @brightness == 255
-      draw_fps(0, 0) if @fps
+      draw_fps(0, 0) if @draw_fps
     end
 
     def scale=(scale)
@@ -96,16 +96,14 @@ module Graphics
     def setup_window
       @default_width = Settings::WINDOW[:width]
       @default_height = Settings::WINDOW[:height]
-      @rect = Rect.new(0, 0,
-                       @default_width,
-                       @default_height)
+      @rect = Rect.new(0, 0, @default_width, @default_height)
       self.scale = Settings::WINDOW[:integer_scale]
       @brightness = 255
-      @fps = true
       @resized = false
       init(@width, @height, Settings::WINDOW[:title])
       # self.target_fps = refresh_rate(current_monitor)
       self.exit_key = 0
+      self.fps = refresh_rate(current_monitor)
     end
 
     def update_fadeout
