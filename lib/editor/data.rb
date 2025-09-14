@@ -14,6 +14,7 @@ module Editor
         quantity: { label: 'Quantity', action: nil, x: 0.910, y: 0.94 },
         save: { label: 'Save', x: 0, y: 0.95 },
         reset: { label: 'Reset', x: 0.822, y: 0.57 },
+        sort: { label: 'Sort by Name', x: 0.822, y: 0.61 },
         delete_blank: { label: 'Delete Blank', x: 0.822, y: 0.53 },
         delete: { label: 'Delete', x: 0.822, y: 0.49 },
         redo: { label: 'Redo', x: 0.822, y: 0.45 },
@@ -114,7 +115,7 @@ module Editor
       @items = load_items.compact
       @items = [@klass.new] if @items.empty?
       @items_changed = true
-      update_item_names_and_cache
+      update_item_names
       # @items.each do |item|
       #   unless item.effects.nil? || item.effects.empty?
       #     item.effects.each do |effect|
@@ -145,29 +146,51 @@ module Editor
       [nil, @klass.new]
     end
 
-    def update_item_names_and_cache
-      return unless @items_changed
+    def update_item_names
+      return unless @items_changed || @text_changed
 
       @item_names = Array.new(@items.size)
-      @item_name_cache = Array.new(@items.size)
       @items.each_with_index do |item, i|
-        name = update_item_name(item, i + 1)
-        @item_names[i] = name
-        @item_name_cache[i] = name.downcase
-      end
-      @items_changed = false
-    end
+        if item.name != '' && !item.name.nil?
+          name = "#{i + 1} - #{item.name}"
+        else
+          name = "#{i + 1}"
+        end
 
-    def update_item_name(item, id)
-      safe_attribute(item, :id, id, true)
-      safe_attribute(item, :name, "Item #{item.id}")
-      "#{item.id} - #{item.name}"
+        @item_names[i] = name
+      end
+
+      @items_changed = false
+      @text_changed = false
     end
 
     def update_items
-      @item = @items[@item_index]
-      update_item_names_and_cache
+      @item = @items[@item_index] unless @item == @items[@item_index]
+      update_text_box
+      update_item_names
       DATA_CONTROLS[:button][:quantity][:label] = "Quantity - #{@items.length}"
+    end
+
+    # Track if any text box was previously being edited
+    def update_text_box
+      @prev_edit_modes ||= {}
+      text_finished = false
+
+      @controls[:text_box].each do |key, props|
+        prev = @prev_edit_modes[key] || false
+        current = props[:edit_mode]
+
+        # Detect transition from true -> false
+        if prev && !current
+          text_finished = true
+        end
+
+        # Update previous state
+        @prev_edit_modes[key] = current
+      end
+
+      # Only set to true when editing finished
+      @text_changed = text_finished
     end
 
     def update_keyboard
@@ -215,9 +238,9 @@ module Editor
 
     def action_item_search(query)
       # Use a faster search if query is a substring, fallback to fuzzy only if needed
-      idx = @item_name_cache.index { |name| name.include?(query) }
+      idx = @item_names.index { |name| name.downcase.include?(query) }
       return idx if idx
-      @item_name_cache.each_with_index.find { |name, _| partial_match(query, name) }&.last || 0
+      @item_names.each_with_index.find { |name, _| partial_match(query, name.downcase) }&.last || 0
     end
 
     def partial_match(query, item_name, threshold = 0.7)
@@ -241,14 +264,16 @@ module Editor
     def with_item_change(stack, msg = nil)
       save_item_state(stack)
       yield
-      @items_changed = true
       update_selected_item
       puts msg if msg
     end
 
     def action_item_new
       with_item_change(@undo_stack, "INFO: Item has been created. Click 'Save' to persist changes.") do
-        @quantity.times { @items << @klass.new }
+        @quantity.times do
+          @items << @klass.new
+          @item_names << "#{@items.size}"
+        end
         @item_index = @items.size - @quantity
       end
     end
@@ -265,7 +290,7 @@ module Editor
 
       save_item_state(@undo_stack)
       @items[@item_index] = @copied_item.dup
-      @items_changed = true
+      @item_names[@item_index] = "#{@item_index + 1} - #{@items[@item_index].name}"
       update_selected_item
       puts "INFO: Copied item has been pasted at the current index. Click 'Save' to persist changes."
     end
@@ -275,6 +300,7 @@ module Editor
 
       with_item_change(@undo_stack, "INFO: Item has been duplicated. Click 'Save' to persist changes.") do
         @items.insert(@item_index + 1, @item.dup)
+        @item_names.insert(@item_index + 1, @item_names[@item_index])
         @item_index += 1
       end
     end
@@ -282,12 +308,14 @@ module Editor
     def action_item_new_above
       with_item_change(@undo_stack, "INFO: Item has been added above. Click 'Save' to persist changes.") do
         @items.insert(@item_index, @klass.new)
+        @item_names.insert(@item_index, '')
       end
     end
 
     def action_item_new_below
       with_item_change(@undo_stack, "INFO: Item has been added below. Click 'Save' to persist changes.") do
         @items.insert(@item_index + 1, @klass.new)
+        @item_names.insert(@item_index + 1, '')
         @item_index += 1
       end
     end
@@ -297,6 +325,7 @@ module Editor
 
       with_item_change(@undo_stack, "INFO: Item has been moved up. Click 'Save' to persist changes.") do
         @items[@item_index], @items[@item_index - 1] = @items[@item_index - 1], @items[@item_index]
+        @item_names[@item_index], @item_names[@item_index - 1] = @item_names[@item_index - 1], @item_names[@item_index]
         @item_index -= 1
       end
     end
@@ -306,6 +335,7 @@ module Editor
 
       with_item_change(@undo_stack, "INFO: Item has been moved down. Click 'Save' to persist changes.") do
         @items[@item_index], @items[@item_index + 1] = @items[@item_index + 1], @items[@item_index]
+        @item_names[@item_index], @item_names[@item_index + 1] = @item_names[@item_index + 1], @item_names[@item_index]
         @item_index += 1
       end
     end
@@ -315,6 +345,7 @@ module Editor
 
       with_item_change(@redo_stack, "INFO: Undo operation performed. Click 'Save' to persist changes.") do
         @items = @undo_stack.pop
+        @items_changed = true
       end
     end
 
@@ -323,6 +354,7 @@ module Editor
 
       with_item_change(@undo_stack, "INFO: Redo operation performed. Click 'Save' to persist changes.") do
         @items = @redo_stack.pop
+        @items_changed = true
       end
     end
 
@@ -330,6 +362,7 @@ module Editor
       with_item_change(@undo_stack, "INFO: Item has been deleted. Click 'Save' to persist changes.") do
         if @items.size > 1
           @items.delete_at(@item_index)
+          @item_names.delete_at(@item_index)
           @item_index = [@item_index - 1, 0].max
         else
           @items = [@klass.new]
@@ -341,6 +374,7 @@ module Editor
       with_item_change(@undo_stack, "INFO: Items with empty names have been deleted. Click 'Save' to persist changes.") do
         @items.reject! { |item| item.name.to_s.strip.empty? }
         @items = [@klass.new] if @items.empty?
+        @item_names.reject! { |name| name.split(' - ')[1].to_s.strip.empty? }
         @item_index = [@item_index, @items.size - 1].min
         @item_index = 0 if @items[@item_index]&.name.to_s.strip.empty?
       end
@@ -348,8 +382,7 @@ module Editor
 
     def action_item_reset
       with_item_change(@undo_stack, 'INFO: Items have been reset to the original state.') do
-        @items = load_items
-        @item_index = 0
+        initialize_items
       end
     end
 
@@ -376,9 +409,32 @@ module Editor
       puts "ERROR: Failed to export CSV to #{export_path}: #{e.message}"
     end
 
-    def action_sort(attribute)
-      with_item_change(@undo_stack, "INFO: Items sorted by '#{attribute}'. Click 'Save' to persist changes.") do
-        @items.sort_by! { |item| item.send(attribute) }
+    def action_item_sort
+      with_item_change(@undo_stack, "INFO: Items sorted by Name. Click 'Save' to persist changes.") do
+        @items.sort_by! do |item|
+          # Extract base name and numeral suffix (like II, III)
+          if item.name.to_s =~ /\A(.+?)\s*(I{1,3}|IV|V|VI|VII|VIII|IX|X)?\z/i
+            base = $1.downcase
+            numeral = $2 || ''
+            numeral_value = case numeral.upcase
+                            when 'I' then 1
+                            when 'II' then 2
+                            when 'III' then 3
+                            when 'IV' then 4
+                            when 'V' then 5
+                            when 'VI' then 6
+                            when 'VII' then 7
+                            when 'VIII' then 8
+                            when 'IX' then 9
+                            when 'X' then 10
+                            else 0
+                            end
+            [base, numeral_value]
+          else
+            [item.name.to_s.downcase, 0]
+          end
+        end
+        @items_changed = true
       end
     end
 
@@ -400,7 +456,6 @@ module Editor
       @item_index = @item_index.clamp(0, @items.size - 1)
       @item_scroll_index = @item_index.clamp(0, [@items.size - 20, 0].max)
       @item = @items[@item_index]
-      update_item_names_and_cache
     end
 
     def action_item_copy_value(controls)
