@@ -79,7 +79,7 @@ module Editor
       draw_list_view(:editor, Editor.list)
       result_search, @search_query = Gui.text_box(@search_query, DATA_CONTROLS[:text_box][:search][:rect], DATA_CONTROLS[:text_box][:search][:length], @edit_modes[:search])
       @edit_modes[:search] = !@edit_modes[:search] if result_search
-      @item_scroll_index, @item_index = Gui.list_view(@item_names, DATA_CONTROLS[:list_view][:item][:rect], @item_scroll_index, @item_index)
+      @item_scroll_index, @item_index = @ui.list_view(@item_names, DATA_CONTROLS[:list_view][:item][:rect], @item_scroll_index, @item_index)
       @autosave = Gui.check_box(DATA_CONTROLS[:check_box][:autosave][:label], DATA_CONTROLS[:check_box][:autosave][:rect], @autosave)
 
       DATA_CONTROLS[:button].each do |symbol, properties|
@@ -92,7 +92,7 @@ module Editor
 
     def draw_list_view(key, text)
       list_view = DATA_CONTROLS[:list_view][key]
-      list_view[:scroll_index], list_view[:value_index] = Gui.list_view(
+      list_view[:scroll_index], list_view[:value_index] = @ui.list_view(
         text || [], list_view[:rect], list_view[:scroll_index], list_view[:value_index]
       )
     rescue => e

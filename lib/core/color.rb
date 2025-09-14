@@ -273,7 +273,9 @@ COLORS_DATA = {
   white: [255, 255, 255],
   white_smoke: [245, 245, 245],
   yellow: [255, 255, 0],
-  yellow_green: [154, 205, 50]
+  yellow_green: [154, 205, 50],
+  light_blue_raygui: [151, 232, 255],
+  blue_raygui: [4, 146, 199]
 }.freeze
 
 COLORS = Hash.new do |hash, key|

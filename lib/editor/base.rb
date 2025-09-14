@@ -20,6 +20,7 @@ module Editor
 
     def initialize(*args)
       #Gui.enable_tooltip
+      @ui = Ui.new
     end
 
     def update(dt)
@@ -116,7 +117,7 @@ module Editor
       when :value_box_float then Gui.value_box_float('', properties[:rect], properties[:text_value], key, properties[:edit_mode])
       when :check_box then Gui.check_box(properties[:original_label] || '', properties[:rect], key)
       when :group_box then Gui.group_box(properties[:label], properties[:rect])
-      when :list_view then Gui.list_view(properties[:text] || special_value, properties[:rect], properties[:scroll_index], properties[:value_index])
+      when :list_view then @ui.list_view(properties[:text] || special_value, properties[:rect], properties[:scroll_index], properties[:value_index])
       when :combo_box then Gui.combo_box(properties[:text] || special_value, properties[:rect], key)
       when :text_input_box then Gui.text_input_box(properties[:rect], properties[:title], properties[:message], properties[:buttons], properties[:text] || key, properties[:length], properties[:secret_view_active])
       when :button then Gui.button(properties[:label], properties[:rect])
